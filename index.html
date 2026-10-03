@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de" data-t="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a2147">
+<title>Bibel-Leseplan</title>
+<style>
+:root{color-scheme:dark;--acc-rgb:60,150,255;--acc:rgb(var(--acc-rgb));--bg1:#06122a;--bg2:#0b2b58;--glass:rgba(255,255,255,.07);--g2:rgba(255,255,255,.1);--gb:rgba(255,255,255,.14);--txt:#eaf2ff;--mut:#9db4d6;--sh:rgba(0,10,40,.35);--sheet:rgba(12,24,50,.95)}
+:root[data-t=light]{color-scheme:light;--bg1:#eaf3ff;--bg2:#cde2ff;--glass:rgba(255,255,255,.55);--g2:rgba(255,255,255,.7);--gb:rgba(255,255,255,.85);--txt:#10243f;--mut:#56708f;--sh:rgba(30,80,160,.18);--sheet:rgba(247,251,255,.97)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,var(--bg1)) fixed;min-height:100%}
+body{font-family:-apple-system,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;color:var(--txt);line-height:1.4;padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(2rem + env(safe-area-inset-bottom)) env(safe-area-inset-left)}
+body.lock{overflow:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 35% at 12% 8%,rgba(var(--acc-rgb),.38),transparent 70%),radial-gradient(55% 40% at 95% 55%,rgba(110,100,255,.2),transparent 70%),radial-gradient(50% 30% at 20% 100%,rgba(40,200,255,.18),transparent 70%)}
+.hasbg body::before{display:none}
+#bg{position:fixed;inset:0;z-index:-3;background-size:cover;background-position:center}
+#dimv{position:fixed;inset:0;z-index:-2;pointer-events:none}
+.wrap{max-width:640px;margin:0 auto;padding:0 .9rem}
+header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0 .2rem}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:-.02em}
+.ib{display:flex;gap:.5rem}
+.ib button{width:46px;height:46px;border-radius:50%;border:1px solid var(--gb);background:var(--glass);color:var(--txt);font-size:1.25rem;cursor:pointer;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.card{background:var(--glass);border:1px solid var(--gb);border-radius:24px;padding:1rem;margin-top:.9rem;box-shadow:0 10px 32px var(--sh);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+.lbl{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+.lbl.hd{margin:1.1rem 0 .5rem .2rem}
+.rd{font-size:1.65rem;font-weight:700;line-height:1.2;margin:.3rem 0 .2rem;letter-spacing:-.01em}
+.rd.s{font-size:1.2rem;margin:.25rem 0}
+.meta,.sline{font-size:.88rem;color:var(--mut)}
+.none{color:var(--mut);padding:.4rem 0;font-size:.95rem}
+.bar{height:10px;background:var(--g2);border-radius:6px;overflow:hidden;margin:.8rem 0 .4rem}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,rgba(var(--acc-rgb),.6),rgba(var(--acc-rgb),1));border-radius:6px}
+.row2{display:grid;grid-template-columns:1fr 1.4fr;gap:.5rem;margin-top:.8rem}
+.main,.ghost{min-height:52px;border-radius:15px;font-size:1.02rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;text-align:center}
+.main{border:1px solid rgba(255,255,255,.35);background:linear-gradient(135deg,rgba(var(--acc-rgb),.98),rgba(var(--acc-rgb),.72));color:#fff;box-shadow:0 8px 22px rgba(var(--acc-rgb),.4)}
+.main:active{transform:scale(.985)}
+.ghost{border:1px solid var(--gb);background:var(--g2);color:var(--txt);font-weight:600}
+.ghost:active{background:rgba(var(--acc-rgb),.3)}
+.ghost.danger{color:#ff6b6b;width:100%;margin-top:1.2rem}
+.books{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.bk{min-height:48px;border-radius:13px;padding:.4rem .3rem;font-size:.74rem;font-weight:600;color:var(--txt);cursor:pointer;font-family:inherit;border:1px solid var(--gb);background:linear-gradient(90deg,rgba(var(--acc-rgb),.5) var(--f),var(--g2) var(--f));word-break:break-word}
+.bk.full{border-color:var(--acc)}
+.cells{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.8rem}
+.cell{background:var(--g2);border:1px solid var(--gb);border-radius:14px;padding:.55rem .3rem;text-align:center}
+.cell b{display:block;font-size:1.05rem}
+.cell span{font-size:.68rem;color:var(--mut)}
+.pct{font-size:2.6rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.pct small{font-size:1.2rem;color:var(--mut);margin-left:.15rem}
+.h{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.55rem 0;border-top:1px solid var(--gb)}
+.h em{display:block;font-style:normal;color:var(--mut);font-size:.8rem}
+.del{flex:0 0 44px;height:44px;border:0;background:transparent;color:var(--mut);font-size:1.1rem;cursor:pointer}
+/* Modals */
+.modal{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,8,25,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal.open{display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:640px;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;background:var(--sheet);border:1px solid var(--gb);border-radius:26px 26px 0 0;animation:up .22s ease-out;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media(min-width:700px){.modal.open{align-items:center}.sheet{border-radius:26px}}
+.sh{display:flex;justify-content:space-between;align-items:center;padding:1rem 1rem .4rem 1.2rem;font-size:1.15rem}
+.x{width:44px;height:44px;border-radius:50%;border:1px solid var(--gb);background:var(--g2);color:var(--txt);font-size:1.05rem;cursor:pointer}
+.sb{overflow:auto;-webkit-overflow-scrolling:touch;padding:.3rem 1.2rem 1rem;flex:1}
+.sf{display:grid;grid-template-columns:1fr 1.8fr;gap:.5rem;padding:.7rem 1.2rem calc(.9rem + env(safe-area-inset-bottom));border-top:1px solid var(--gb)}
+.sb .lbl{margin:.9rem 0 .35rem}
+.sel3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.4rem}
+select,input[type=date]{width:100%;height:50px;padding:0 .6rem;border-radius:14px;border:1px solid var(--gb);background:var(--g2);color:var(--txt);font-size:16px;font-family:inherit;-webkit-appearance:none;appearance:none}
+input[type=range]{width:100%;height:44px;accent-color:var(--acc)}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.quick .ghost{min-height:44px;font-size:.92rem}
+.seg{display:flex;background:var(--g2);border:1px solid var(--gb);border-radius:15px;padding:3px}
+.seg button{flex:1;min-height:44px;border:1px solid transparent;background:transparent;color:var(--txt);font-size:.98rem;font-weight:600;border-radius:12px;cursor:pointer;font-family:inherit}
+.seg button.on{background:rgba(var(--acc-rgb),.3);border-color:var(--acc)}
+.sw{display:flex;gap:.55rem;flex-wrap:wrap}
+.sw button,.sw input{width:42px;height:42px;border-radius:50%;border:2px solid var(--gb);cursor:pointer;padding:0;background:none}
+.sw button.on{border-color:var(--txt);box-shadow:0 0 0 2px var(--acc)}
+.chs{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem}
+.ch{min-height:50px;border-radius:13px;font-size:1rem;font-weight:700;color:var(--txt);cursor:pointer;font-family:inherit;border:1px solid var(--gb);background:linear-gradient(90deg,rgba(var(--acc-rgb),.55) var(--f),var(--g2) var(--f))}
+.ch.full{border-color:var(--acc)}
+#toast{position:fixed;left:50%;bottom:calc(1.5rem + env(safe-area-inset-bottom));transform:translate(-50%,20px);padding:.7rem 1.2rem;border-radius:30px;background:var(--sheet);border:1px solid var(--acc);font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="dimv"></div>
+<div class="wrap">
+  <header><h1 data-k="title"></h1><div class="ib"><button id="bProg" aria-label="Progress">📊</button><button id="bSet" aria-label="Settings">⚙️</button></div></header>
+  <section class="card" id="last"></section>
+  <section class="card" id="next"></section>
+  <div id="shelf"></div>
+</div>
+
+<!-- Lesung wählen -->
+<div class="modal" id="mRead"><div class="sheet">
+  <div class="sh"><b data-k="read"></b><button class="x" data-x>✕</button></div>
+  <div class="sb">
+    <div class="rd" id="rrd"></div><div class="meta" id="rmeta"></div>
+    <input type="range" id="rsl" min="1" value="1">
+    <div class="quick"><button class="ghost" id="qs" data-k="qs"></button><button class="ghost" id="qc" data-k="qc"></button></div>
+    <div class="lbl" data-k="fromL"></div>
+    <div class="sel3"><select id="fB"></select><select id="fC"></select><select id="fV"></select></div>
+    <div class="lbl" data-k="toL"></div>
+    <div class="sel3"><select id="tB"></select><select id="tC"></select><select id="tV"></select></div>
+    <div class="lbl" data-k="date"></div>
+    <input type="date" id="rdate">
+  </div>
+  <div class="sf"><button class="ghost" data-x data-k="cancel"></button><button class="main" id="rMark" data-k="mark"></button></div>
+</div></div>
+
+<!-- Kapitel eines Buchs -->
+<div class="modal" id="mBook"><div class="sheet">
+  <div class="sh"><b id="bkT"></b><button class="x" data-x>✕</button></div>
+  <div class="sb"><div class="chs" id="chs"></div></div>
+</div></div>
+
+<!-- Fortschritt -->
+<div class="modal" id="mProg"><div class="sheet">
+  <div class="sh"><b data-k="prog"></b><button class="x" data-x>✕</button></div>
+  <div class="sb" id="pBody"></div>
+</div></div>
+
+<!-- Einstellungen -->
+<div class="modal" id="mSet"><div class="sheet">
+  <div class="sh"><b data-k="set"></b><button class="x" data-x>✕</button></div>
+  <div class="sb">
+    <div class="lbl" data-k="lang"></div>
+    <div class="seg" id="langSeg"><button data-l="ru">Русский</button><button data-l="de">Deutsch</button><button data-l="en">English</button></div>
+    <div class="lbl" data-k="plan"></div>
+    <div class="seg" id="modeSeg"><button data-m="1" data-k="m1"></button><button data-m="3" data-k="m3"></button></div>
+    <div class="lbl" data-k="look"></div>
+    <div class="seg" id="thSeg"><button data-th="auto" data-k="auto"></button><button data-th="light" data-k="light"></button><button data-th="dark" data-k="dark"></button></div>
+    <div class="lbl" data-k="accent"></div>
+    <div class="sw" id="sw"></div>
+    <div class="lbl" data-k="bg"></div>
+    <div class="row2" style="margin-top:0;grid-template-columns:1fr 1fr"><label class="ghost" for="bgIn" data-k="pickBg"></label><button class="ghost" id="bgRm" data-k="rmBg"></button></div>
+    <input type="file" id="bgIn" accept="image/*" hidden>
+    <div class="lbl" data-k="dim"></div>
+    <input type="range" id="dimIn" min="0" max="80">
+    <div class="lbl" data-k="backup"></div>
+    <div class="row2" style="margin-top:0;grid-template-columns:1fr 1fr"><button class="ghost" id="exp" data-k="exp"></button><label class="ghost" for="imp" data-k="imp"></label></div>
+    <input type="file" id="imp" accept="application/json,.json" hidden>
+    <button class="ghost danger" id="reset" data-k="reset"></button>
+  </div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+const BK=[
+["1. Mose","Бытие","Genesis","31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26"],
+["2. Mose","Исход","Exodus","22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38"],
+["3. Mose","Левит","Leviticus","17,16,17,35,19,30,38,36,24,20,47,8,59,57,33,34,16,30,37,27,24,33,44,23,55,46,34"],
+["4. Mose","Числа","Numbers","54,34,51,49,31,27,89,26,23,36,35,16,33,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,40,16,54,42,56,29,34,13"],
+["5. Mose","Второзаконие","Deuteronomy","46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12"],
+["Josua","Иисус Навин","Joshua","18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33"],
+["Richter","Судьи","Judges","36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25"],
+["Ruth","Руфь","Ruth","22,23,18,22"],
+["1. Samuel","1 Самуила","1 Samuel","28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,42,15,23,29,22,44,25,12,25,11,31,13"],
+["2. Samuel","2 Самуила","2 Samuel","27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25"],
+["1. Könige","1 Царей","1 Kings","53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53"],
+["2. Könige","2 Царей","2 Kings","18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30"],
+["1. Chronika","1 Летопись","1 Chronicles","54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30"],
+["2. Chronika","2 Летопись","2 Chronicles","17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23"],
+["Esra","Ездра","Ezra","11,70,13,24,17,22,28,36,15,44"],
+["Nehemia","Неемия","Nehemiah","11,20,32,23,19,19,73,18,38,39,36,47,31"],
+["Esther","Есфирь","Esther","22,23,15,17,14,14,10,17,32,3"],
+["Hiob","Иов","Job","22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,30,24,34,17"],
+["Psalm","Псалмы","Psalms","6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6"],
+["Sprüche","Притчи","Proverbs","33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31"],
+["Prediger","Экклесиаст","Ecclesiastes","18,26,22,16,20,12,29,17,18,20,10,14"],
+["Hohes Lied","Песнь песней","Song of Solomon","17,17,11,16,16,13,13,14"],
+["Jesaja","Исаия","Isaiah","31,22,26,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24"],
+["Jeremia","Иеремия","Jeremiah","19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34"],
+["Klagelieder","Плач","Lamentations","22,22,66,22,22"],
+["Hesekiel","Иезекииль","Ezekiel","28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35"],
+["Daniel","Даниил","Daniel","21,49,30,37,31,28,28,27,27,21,45,13"],
+["Hosea","Осия","Hosea","11,23,5,19,15,11,16,14,17,15,12,14,16,9"],
+["Joel","Иоиль","Joel","20,32,21"],
+["Amos","Амос","Amos","15,16,15,13,27,14,17,14,15"],
+["Obadja","Авдий","Obadiah","21"],
+["Jona","Иона","Jonah","17,10,10,11"],
+["Micha","Михей","Micah","16,13,12,13,15,16,20"],
+["Nahum","Наум","Nahum","15,13,19"],
+["Habakuk","Аввакум","Habakkuk","17,20,19"],
+["Zephania","Софония","Zephaniah","18,15,20"],
+["Haggai","Аггей","Haggai","15,23"],
+["Sacharja","Захария","Zechariah","21,13,10,14,11,15,14,23,17,12,17,14,9,21"],
+["Maleachi","Малахия","Malachi","14,17,18,6"],
+["Matthäus","Матфея","Matthew","25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20"],
+["Markus","Марка","Mark","45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20"],
+["Lukas","Луки","Luke","80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53"],
+["Johannes","Иоанна","John","51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25"],
+["Apostelgeschichte","Деяния","Acts","26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,41,38,40,30,35,27,27,32,44,31"],
+["Römer","Римлянам","Romans","32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27"],
+["1. Korinther","1 Коринфянам","1 Corinthians","31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24"],
+["2. Korinther","2 Коринфянам","2 Corinthians","24,17,18,18,21,18,16,24,15,18,33,21,14"],
+["Galater","Галатам","Galatians","24,21,29,31,26,18"],
+["Epheser","Ефесянам","Ephesians","23,22,21,32,33,24"],
+["Philipper","Филиппийцам","Philippians","30,30,21,23"],
+["Kolosser","Колоссянам","Colossians","29,23,25,18"],
+["1. Thessalonicher","1 Фессалоникийцам","1 Thessalonians","10,20,13,18,28"],
+["2. Thessalonicher","2 Фессалоникийцам","2 Thessalonians","12,17,18"],
+["1. Timotheus","1 Тимофею","1 Timothy","20,15,16,16,25,21"],
+["2. Timotheus","2 Тимофею","2 Timothy","18,26,17,22"],
+["Titus","Титу","Titus","16,15,15"],
+["Philemon","Филимону","Philemon","25"],
+["Hebräer","Евреям","Hebrews","14,18,19,16,14,20,28,13,28,39,40,29,25"],
+["Jakobus","Иакова","James","27,26,18,17,20"],
+["1. Petrus","1 Петра","1 Peter","25,25,22,19,14"],
+["2. Petrus","2 Петра","2 Peter","21,22,18"],
+["1. Johannes","1 Иоанна","1 John","10,29,24,21,21"],
+["2. Johannes","2 Иоанна","2 John","13"],
+["3. Johannes","3 Иоанна","3 John","14"],
+["Judas","Иуды","Jude","25"],
+["Offenbarung","Откровение","Revelation","20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21"]
+];
+const L={de:0,ru:1,en:2},LOC={de:"de-DE",ru:"ru-RU",en:"en-GB"};
+const T={
+ de:{title:"📖 Bibel-Leseplan",m1:"1 Jahr",m3:"3 Jahre",last0:"Zuletzt gelesen",none:"Noch nichts gelesen. Tippe auf „Ändern“ oder wähle unten ein Buch.",nextL:"Als Nächstes",done:"✓ Gelesen",chg:"Ändern",verses:"Verse",sugg:"Vorschlag",ot:"Hebräische Schriften",nt:"Griechische Schriften",prog:"Fortschritt",set:"Einstellungen",read:"Lesung wählen",fromL:"Von",toL:"Bis",date:"Gelesen am",qs:"Vorschlag",qc:"Kapitelende",cancel:"Abbrechen",mark:"✓ Als gelesen markieren",saved:"Gespeichert ✓",perDay:"Ø Verse/Tag",finish:"Fertig ca.",ahead:"voraus",behind:"zurück",onplan:"im Plan",streak:"Tage in Folge",days:"Lesetage",bdone:"Bücher fertig",hist:"Verlauf",noneH:"Noch keine Einträge.",del:"Eintrag löschen?",lang:"Sprache",plan:"Plan",look:"Darstellung",auto:"Auto",light:"Hell",dark:"Dunkel",accent:"Farbe",bg:"Hintergrundbild",pickBg:"Bild wählen",rmBg:"Entfernen",dim:"Abdunkeln",backup:"Sicherung",exp:"Exportieren",imp:"Importieren",reset:"Alles zurücksetzen",ask:"Fortschritt und Verlauf komplett löschen?",fin:"🎉 Bibel komplett gelesen!",ago:n=>n<1?"Heute gelesen":n===1?"Gestern gelesen":"Vor "+n+" Tagen gelesen",already:n=>n+" schon gelesen"},
+ ru:{title:"📖 План чтения Библии",m1:"1 год",m3:"3 года",last0:"Последнее чтение",none:"Пока ничего не прочитано. Нажмите «Изменить» или выберите книгу ниже.",nextL:"Далее",done:"✓ Прочитано",chg:"Изменить",verses:"стихов",sugg:"план",ot:"Еврейские Писания",nt:"Греческие Писания",prog:"Прогресс",set:"Настройки",read:"Выбор чтения",fromL:"С",toL:"До",date:"Дата чтения",qs:"План",qc:"Конец главы",cancel:"Отмена",mark:"✓ Отметить прочитанным",saved:"Сохранено ✓",perDay:"Ø стихов/день",finish:"Закончу ~",ahead:"впереди",behind:"отставание",onplan:"по плану",streak:"дней подряд",days:"дней чтения",bdone:"книг прочитано",hist:"История",noneH:"Записей пока нет.",del:"Удалить запись?",lang:"Язык",plan:"План",look:"Оформление",auto:"Авто",light:"Светлая",dark:"Тёмная",accent:"Цвет",bg:"Фоновое изображение",pickBg:"Выбрать фото",rmBg:"Убрать",dim:"Затемнение",backup:"Резервная копия",exp:"Экспорт",imp:"Импорт",reset:"Сбросить всё",ask:"Удалить весь прогресс и историю?",fin:"🎉 Вся Библия прочитана!",ago:n=>n<1?"Прочитано сегодня":n===1?"Прочитано вчера":"Прочитано "+n+" дн. назад",already:n=>n+" уже прочитано"},
+ en:{title:"📖 Bible Reading Plan",m1:"1 year",m3:"3 years",last0:"Last read",none:"Nothing read yet. Tap “Change” or pick a book below.",nextL:"Up next",done:"✓ Done",chg:"Change",verses:"verses",sugg:"suggested",ot:"Hebrew Scriptures",nt:"Greek Scriptures",prog:"Progress",set:"Settings",read:"Choose reading",fromL:"From",toL:"To",date:"Read on",qs:"Suggested",qc:"Chapter end",cancel:"Cancel",mark:"✓ Mark as read",saved:"Saved ✓",perDay:"Ø verses/day",finish:"Finish ~",ahead:"ahead",behind:"behind",onplan:"on plan",streak:"day streak",days:"days read",bdone:"books done",hist:"History",noneH:"No entries yet.",del:"Delete entry?",lang:"Language",plan:"Plan",look:"Appearance",auto:"Auto",light:"Light",dark:"Dark",accent:"Colour",bg:"Background image",pickBg:"Choose photo",rmBg:"Remove",dim:"Dimming",backup:"Backup",exp:"Export",imp:"Import",reset:"Reset everything",ask:"Delete all progress and history?",fin:"🎉 Whole Bible read!",ago:n=>n<1?"Read today":n===1?"Read yesterday":"Read "+n+" days ago",already:n=>n+" already read"}
+};
+// Kapitel-/Verstabelle
+const CH=[];BK.forEach((b,i)=>b[3].split(",").forEach((v,j)=>CH.push([i,j+1,+v])));
+const CS=[],CBS=[],NC=BK.map(b=>b[3].split(",").length);let V=0;
+CH.forEach((c,i)=>{CS.push(V);V+=c[2];if(c[1]===1)CBS[c[0]]=i});
+const BS=BK.map((b,i)=>CS[CBS[i]]),BV=BK.map(b=>b[3].split(",").reduce((x,y)=>x+ +y,0));
+function loc(g){let lo=0,hi=CS.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(CS[m]<=g)lo=m;else hi=m-1}const c=CH[lo];return{b:c[0],c:c[1],v:g-CS[lo]+1}}
+const one=b=>NC[b]===1;
+function ref(p,lang){const n=BK[p.b][L[lang]];return one(p.b)?n+" "+p.v:n+" "+p.c+":"+p.v}
+function rng(ai,bi,lang){
+  const a=loc(ai),z=loc(bi),n=BK[a.b][L[lang]];
+  if(a.b===z.b){
+    if(one(a.b))return a.v===z.v?n+" "+a.v:n+" "+a.v+"–"+z.v;
+    if(a.c===z.c)return a.v===z.v?n+" "+a.c+":"+a.v:n+" "+a.c+":"+a.v+"–"+z.v;
+    return n+" "+a.c+":"+a.v+"–"+z.c+":"+z.v;
+  }
+  return ref(a,lang)+" – "+ref(z,lang);
+}
+
+
+// ---------- Zustand: log = [von,bis,Datum]; "gelesen" = Vereinigung aller Einträge ----------
+const KEY="bibel_leseplan_v4",BGK="bibel_leseplan_bg";
+let S={lang:null,mode:"3",theme:"auto",acc:"#3c96ff",dim:35,log:[]};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)S=Object.assign(S,x)}catch(e){}
+S.log=(Array.isArray(S.log)?S.log:[]).filter(l=>Array.isArray(l)&&l.length===3&&l[0]>=0&&l[1]<V&&l[0]<=l[1]);
+if(!S.lang){const n=(navigator.language||"de").slice(0,2);S.lang=T[n]?n:"de"}
+let BGD=null;try{BGD=localStorage.getItem(BGK)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const ymd=d=>{d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const addDay=(s,n)=>{const d=new Date(s+"T12:00");d.setDate(d.getDate()+n);return ymd(d)};
+const dayDiff=(a,b)=>Math.round((new Date(b+"T12:00")-new Date(a+"T12:00"))/864e5);
+const nf=n=>n.toLocaleString(LOC[S.lang]);
+const fmtD=(d,o)=>d.toLocaleDateString(LOC[S.lang],o);
+const sugg=()=>Math.ceil(V/(S.mode==="1"?365:1095));
+const cmp=(a,b)=>a[0][2]<b[0][2]?-1:a[0][2]>b[0][2]?1:a[1]-b[1];
+const ord=()=>S.log.map((l,i)=>[l,i]).sort(cmp).map(x=>x[0]);
+
+let RD=[];
+function calc(){
+  const a=S.log.map(l=>[l[0],l[1]]).sort((x,y)=>x[0]-y[0]);RD=[];
+  for(const r of a){const l=RD[RD.length-1];if(l&&r[0]<=l[1]+1)l[1]=Math.max(l[1],r[1]);else RD.push([r[0],r[1]])}
+}
+const covered=()=>RD.reduce((s,r)=>s+r[1]-r[0]+1,0);
+function ovl(a,b){let n=0;for(const r of RD){if(r[1]<a)continue;if(r[0]>b)break;n+=Math.min(b,r[1])-Math.max(a,r[0])+1}return n}
+function nextUnread(g){
+  if(g>=V)g=0;
+  for(const r of RD){if(r[1]<g)continue;if(r[0]>g)break;g=r[1]+1}
+  if(g<V)return g;
+  g=0;for(const r of RD){if(r[0]>g)break;g=r[1]+1}
+  return g<V?g:V;
+}
+function nextRange(){
+  if(covered()>=V)return null;
+  const o=ord(),f=nextUnread(o.length?o[o.length-1][1]+1:0);
+  return f>=V?null:[f,Math.min(V-1,f+sugg()-1)];
+}
+
+// ---------- Theme / Hintergrund ----------
+const mq=matchMedia("(prefers-color-scheme: dark)");
+const hex2rgb=h=>{const n=parseInt((h||"").slice(1),16);return isNaN(n)?"60,150,255":[n>>16&255,n>>8&255,n&255].join(",")};
+function theme(){
+  const dark=S.theme==="auto"?mq.matches:S.theme==="dark",r=document.documentElement;
+  r.dataset.t=dark?"dark":"light";r.style.setProperty("--acc-rgb",hex2rgb(S.acc));
+  r.classList.toggle("hasbg",!!BGD);
+  $("bg").style.backgroundImage=BGD?"url("+BGD+")":"";
+  const a=S.dim/100;$("dimv").style.background=BGD?(dark?"rgba(0,8,24,"+a+")":"rgba(255,255,255,"+a+")"):"";
+}
+mq.addEventListener&&mq.addEventListener("change",theme);
+
+// ---------- Modals ----------
+const open=id=>{$(id).classList.add("open");document.body.classList.add("lock")};
+const close=id=>{$(id).classList.remove("open");if(!document.querySelector(".modal.open"))document.body.classList.remove("lock")};
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m||e.target.closest("[data-x]"))close(m.id)}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal.open").forEach(m=>close(m.id))});
+let tt;function toast(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),1800)}
+
+// ---------- Startseite ----------
+function home(){
+  const t=T[S.lang],o=ord(),cov=covered(),pct=Math.round(cov/V*1000)/10;
+  let h;
+  if(o.length){const d=o[o.length-1][2];h='<div class="lbl">'+t.ago(Math.max(0,dayDiff(d,ymd())))+'</div>'+o.filter(x=>x[2]===d).map(x=>'<div class="rd s">'+rng(x[0],x[1],S.lang)+'</div>').join("")}
+  else h='<div class="lbl">'+t.last0+'</div><div class="none">'+t.none+'</div>';
+  $("last").innerHTML=h+'<div class="bar"><i style="width:'+cov/V*100+'%"></i></div><div class="sline">'+pct+'% · '+nf(cov)+' / '+nf(V)+' '+t.verses+'</div>';
+  const r=nextRange();
+  $("next").innerHTML=r?'<div class="lbl">'+t.nextL+'</div><div class="rd">'+rng(r[0],r[1],S.lang)+'</div><div class="meta">'+(r[1]-r[0]+1)+' '+t.verses+'</div><div class="row2"><button class="ghost" data-a="chg">'+t.chg+'</button><button class="main" data-a="done">'+t.done+'</button></div>':'<div class="rd">'+t.fin+'</div>';
+  let b="";
+  BK.forEach((k,i)=>{
+    if(i===0)b+='<div class="lbl hd">'+t.ot+'</div><div class="books">';
+    if(i===39)b+='</div><div class="lbl hd">'+t.nt+'</div><div class="books">';
+    const f=ovl(BS[i],BS[i]+BV[i]-1)/BV[i];
+    b+='<button class="bk'+(f>=1?' full':'')+'" data-b="'+i+'" style="--f:'+f*100+'%">'+k[L[S.lang]]+'</button>';
+  });
+  $("shelf").innerHTML=b+'</div>';
+}
+function texts(){
+  const t=T[S.lang];document.documentElement.lang=S.lang;
+  document.querySelectorAll("[data-k]").forEach(e=>e.textContent=t[e.dataset.k]);
+}
+function sync(){
+  document.querySelectorAll("#langSeg button").forEach(b=>b.classList.toggle("on",b.dataset.l===S.lang));
+  document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===S.mode));
+  document.querySelectorAll("#thSeg button").forEach(b=>b.classList.toggle("on",b.dataset.th===S.theme));
+  document.querySelectorAll("#sw button").forEach(b=>b.classList.toggle("on",b.dataset.c===S.acc));
+  $("accIn").value=/^#[0-9a-f]{6}$/i.test(S.acc)?S.acc:"#3c96ff";$("dimIn").value=S.dim;
+}
+function renderAll(){calc();texts();home();sync();if($("mProg").classList.contains("open"))prog()}
+function add(f,e,d){S.log.push([f,e,d]);save();close("mRead");renderAll();toast(T[S.lang].saved)}
+
+// ---------- Lesung wählen (Modal) ----------
+let D={f:0,e:0,d:""};
+function openRead(f,e){D={f:f,e:e,d:ymd()};fillRead();open("mRead")}
+function selFill(p,idx){
+  const q=loc(idx);
+  $(p+"B").innerHTML=BK.map((b,i)=>'<option value="'+i+'"'+(i===q.b?' selected':'')+'>'+b[L[S.lang]]+'</option>').join("");
+  let h="";for(let c=1;c<=NC[q.b];c++)h+='<option'+(c===q.c?' selected':'')+'>'+c+'</option>';$(p+"C").innerHTML=h;
+  const nv=CH[CBS[q.b]+q.c-1][2];h="";for(let v=1;v<=nv;v++)h+='<option'+(v===q.v?' selected':'')+'>'+v+'</option>';$(p+"V").innerHTML=h;
+}
+function info(){
+  const t=T[S.lang],o=ovl(D.f,D.e);
+  $("rrd").textContent=rng(D.f,D.e,S.lang);
+  $("rmeta").textContent=(D.e-D.f+1)+" "+t.verses+" · "+t.sugg+" "+sugg()+(o?" · "+t.already(o):"");
+}
+function fillRead(){
+  info();selFill("f",D.f);selFill("t",D.e);
+  const n=D.e-D.f+1,sl=$("rsl");sl.max=Math.max(n,Math.min(V-D.f,Math.max(sugg()*4,150)));sl.value=n;
+  $("rdate").max=ymd();$("rdate").value=D.d;
+}
+["f","t"].forEach(p=>["B","C","V"].forEach(k=>$(p+k).onchange=e=>{
+  let b=+$(p+"B").value,c=+$(p+"C").value,v=+$(p+"V").value;
+  if(k==="B"){c=1;v=1}else if(k==="C")v=1;
+  c=Math.min(c,NC[b]);const ci=CBS[b]+c-1;v=Math.min(v,CH[ci][2]);const g=CS[ci]+v-1;
+  if(p==="f"){const n=D.e-D.f+1;D.f=g;D.e=Math.min(V-1,g+n-1)}else D.e=Math.max(D.f,g);
+  fillRead();
+}));
+$("rsl").oninput=e=>{D.e=D.f+(+e.target.value)-1;info()};
+$("rsl").onchange=fillRead;
+$("qs").onclick=()=>{D.e=Math.min(V-1,D.f+sugg()-1);fillRead()};
+$("qc").onclick=()=>{const p=loc(D.e);let ci=CBS[p.b]+p.c-1;if(D.e===CS[ci]+CH[ci][2]-1&&ci<CH.length-1)ci++;D.e=CS[ci]+CH[ci][2]-1;fillRead()};
+$("rdate").onchange=e=>{D.d=e.target.value||ymd()};
+$("rMark").onclick=()=>add(D.f,D.e,D.d>ymd()?ymd():D.d);
+
+// ---------- Kapitel-Modal ----------
+function openBook(b){
+  $("bkT").textContent=BK[b][L[S.lang]];
+  let h="";
+  for(let c=1;c<=NC[b];c++){const ci=CBS[b]+c-1,n=CH[ci][2],f=ovl(CS[ci],CS[ci]+n-1)/n;h+='<button class="ch'+(f>=1?' full':'')+'" data-c="'+ci+'" style="--f:'+f*100+'%">'+c+'</button>'}
+  $("chs").innerHTML=h;open("mBook");
+}
+$("chs").onclick=e=>{const b=e.target.closest("[data-c]");if(b){const ci=+b.dataset.c;close("mBook");openRead(CS[ci],CS[ci]+CH[ci][2]-1)}};
+
+// ---------- Fortschritt-Modal ----------
+function prog(){
+  const t=T[S.lang],cov=covered(),pct=Math.round(cov/V*1000)/10,c=[];
+  if(S.log.length&&cov>0&&cov<V){
+    const first=S.log.reduce((m,l)=>l[2]<m?l[2]:m,S.log[0][2]),el=Math.max(1,dayDiff(first,ymd())+1),avg=cov/el,fin=new Date();
+    fin.setDate(fin.getDate()+Math.ceil((V-cov)/avg));
+    const diff=cov-Math.min(V,sugg()*el);
+    c.push([Math.round(avg),t.perDay],[fmtD(fin,{day:"numeric",month:"short",year:"2-digit"}),t.finish],[diff===0?"✓":(diff>0?"+":"−")+nf(Math.abs(diff)),diff>0?t.ahead:diff<0?t.behind:t.onplan]);
+  }
+  const ds=[...new Set(S.log.map(l=>l[2]))];let st=0,cur=ymd();
+  if(ds.length){if(!ds.includes(cur))cur=addDay(cur,-1);while(ds.includes(cur)){st++;cur=addDay(cur,-1)}}
+  c.push([st,t.streak],[ds.length,t.days],[BK.filter((b,i)=>ovl(BS[i],BS[i]+BV[i]-1)>=BV[i]).length,t.bdone]);
+  let h='<div class="pct">'+pct+'<small>%</small></div><div class="bar"><i style="width:'+cov/V*100+'%"></i></div><div class="sline">'+nf(cov)+' / '+nf(V)+' '+t.verses+'</div><div class="cells">'+c.map(x=>'<div class="cell"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("")+'</div><div class="lbl" style="margin-top:1.2rem">'+t.hist+'</div>';
+  const rows=S.log.map((l,i)=>[l,i]).sort((a,b)=>-cmp(a,b));
+  h+=rows.length?rows.map(x=>'<div class="h"><div><div>'+rng(x[0][0],x[0][1],S.lang)+'</div><em>'+fmtD(new Date(x[0][2]+"T12:00"),{weekday:"short",day:"numeric",month:"short"})+' · '+(x[0][1]-x[0][0]+1)+' '+t.verses+'</em></div><button class="del" data-i="'+x[1]+'" aria-label="x">✕</button></div>').join(""):'<div class="none">'+t.noneH+'</div>';
+  $("pBody").innerHTML=h;
+}
+$("pBody").onclick=e=>{const b=e.target.closest("[data-i]");if(b&&confirm(T[S.lang].del)){S.log.splice(+b.dataset.i,1);save();renderAll()}};
+
+// ---------- Startseite-Events ----------
+$("next").onclick=e=>{const b=e.target.closest("[data-a]"),r=nextRange();if(!b||!r)return;if(b.dataset.a==="done")add(r[0],r[1],ymd());else openRead(r[0],r[1])};
+$("shelf").onclick=e=>{const b=e.target.closest("[data-b]");if(b)openBook(+b.dataset.b)};
+$("bProg").onclick=()=>{prog();open("mProg")};
+$("bSet").onclick=()=>{sync();open("mSet")};
+
+// ---------- Einstellungen ----------
+const COL=["#3c96ff","#14b8a6","#8b5cf6","#22c55e","#f59e0b","#ec4899","#ef4444"];
+$("sw").innerHTML=COL.map(c=>'<button data-c="'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>').join("")+'<input type="color" id="accIn">';
+$("langSeg").onclick=e=>{const b=e.target.closest("button");if(b){S.lang=b.dataset.l;save();renderAll()}};
+$("modeSeg").onclick=e=>{const b=e.target.closest("button");if(b){S.mode=b.dataset.m;save();renderAll()}};
+$("thSeg").onclick=e=>{const b=e.target.closest("button");if(b){S.theme=b.dataset.th;save();theme();sync()}};
+$("sw").onclick=e=>{const b=e.target.closest("button");if(b){S.acc=b.dataset.c;save();theme();sync()}};
+$("accIn").oninput=e=>{S.acc=e.target.value;save();theme();document.querySelectorAll("#sw button").forEach(b=>b.classList.remove("on"))};
+$("dimIn").oninput=e=>{S.dim=+e.target.value;save();theme()};
+$("bgIn").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image,u=URL.createObjectURL(f);
+  img.onload=()=>{
+    const r=Math.min(1,1400/Math.max(img.width,img.height)),c=document.createElement("canvas");
+    c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    BGD=c.toDataURL("image/jpeg",.78);try{localStorage.setItem(BGK,BGD)}catch(_){}
+    URL.revokeObjectURL(u);theme();
+  };
+  img.src=u;e.target.value="";
+};
+$("bgRm").onclick=()=>{BGD=null;try{localStorage.removeItem(BGK)}catch(_){}theme()};
+$("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({log:S.log})],{type:"application/json"}));a.download="bibel-leseplan-backup.json";a.click()};
+$("imp").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  f.text().then(x=>{try{const j=JSON.parse(x);if(Array.isArray(j.log)){S.log=j.log.filter(l=>Array.isArray(l)&&l.length===3&&l[0]>=0&&l[1]<V&&l[0]<=l[1]);save();renderAll();toast(T[S.lang].saved)}}catch(_){}});
+  e.target.value="";
+};
+$("reset").onclick=()=>{if(confirm(T[S.lang].ask)){S.log=[];save();renderAll()}};
+
+theme();renderAll();
+</script>
+</body>
+</html>
